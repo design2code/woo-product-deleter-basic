@@ -7,11 +7,7 @@ if (!defined('ABSPATH')) {
 class D2c_ProductDeleteSettingsPage
 {
 
-    // public $logfile = POS_PLUGIN_PATH.'pos_settings_log.txt';
-    // public $image_logfile = POS_PLUGIN_PATH.'pos_settings_images_log.txt';
-
     //define endpoints
-
     public function __construct()
     {
         set_time_limit(0);
@@ -64,21 +60,19 @@ class D2c_ProductDeleteSettingsPage
                         action="<?php echo $_SERVER['PHP_SELF'] . '?page=' . $_GET['page'] . '&action=d2c-products-checker'; ?>"
                         id="d2c_pos_import_pos_form">
                         <?php wp_nonce_field('d2c_get_products', 'd2c_get_products'); ?>
-                        <h2>Check Products</h2>
+                        <h2><?php echo __('Check Products', 'd2c-product-deleter'); ?></h2>
                         <div class="d2c_settings_row">
-                            <label>Products to check:</label>
-                            <select name="product_count" id="">
-                                <option value="1">1</option>
-                                <option value="10">10</option>
+                            <label><?php echo __('How many products would you like to search through?', 'd2c-product-deleter'); ?></label>
+                            <select name="product_count" id="product_count">
+                                <option value="-1">All</option>
                                 <option value="50">50</option>
                                 <option value="100">100</option>
                                 <option value="200">200</option>
                                 <option value="500">500</option>
-                                <option value="-1">All</option>
                             </select>
                         </div>
                         <div class="d2c_settings_row">
-                            <label>Product Status:</label>
+                            <label><?php echo __('Product Status', 'd2c-product-deleter'); ?></label>
                             <select name="product_status" id="product_status">
                                 <option value="any">All</option>
                                 <option value="publish">Published</option>
@@ -87,7 +81,16 @@ class D2c_ProductDeleteSettingsPage
                             </select>
                         </div>
                         <div class="d2c_settings_row">
-                            <label>Product Category:</label>
+                            <label><?php echo __('Product Stock Status', 'd2c-product-deleter'); ?></label>
+                            <select name="product_stock_status" id="product_stock_status">
+                                <option value="any">Any</option>
+                                <option value="instock">In Stock</option>
+                                <option value="outofstock">Out of Stock</option>
+                                <option value="onbackorder">On Backorder</option>
+                            </select>
+                        </div>
+                        <div class="d2c_settings_row">
+                            <label><?php echo __('Product Category Selector', 'd2c-product-deleter'); ?></label>
                             <select name="product_category" id="product_category">
                                 <option value="any">All</option>
                                 <?php
@@ -118,7 +121,8 @@ class D2c_ProductDeleteSettingsPage
                     global $post;
                     $site_url = get_bloginfo('url');
                     $count = $_POST['product_count'];
-                    $status = $_POST['product_status'];
+                    $products_status = $_POST['product_status'];//Any, Published, Draft, Trash
+                    $products_stock_status = $_POST['product_stock_status']; //instock or outofstock
                     $category = $_POST['product_category'];
 
                     //Fetch products, limited to selected amount
@@ -126,7 +130,7 @@ class D2c_ProductDeleteSettingsPage
                         $args = array(
                             'numberposts' => $count,
                             'post_type' => array('product'),
-                            'post_status' => $status,
+                            'post_status' => $products_status,
                             'tax_query'      => array(
                                 array(
                                     'taxonomy' => 'product_cat',
@@ -139,7 +143,17 @@ class D2c_ProductDeleteSettingsPage
                         $args = array(
                             'numberposts' => $count,
                             'post_type' => array('product'),
-                            'post_status' => $status
+                            'post_status' => $products_status
+                        );
+                    }
+
+                    if($products_stock_status !== 'any'){
+                        $args['meta_query'] =  array(
+                            array(
+                                'key'     => '_stock_status',
+                                'value'   => $products_stock_status,
+                                'compare' => '='
+                            )
                         );
                     }
 
@@ -162,11 +176,13 @@ class D2c_ProductDeleteSettingsPage
                         $ajax_nonce = wp_create_nonce('d2c-delete-products');
 
                         if($category != 'any'){
-                            echo '<button data-cat="'.$category.'" data-status="' . $status . '" data-count="' . $count . '"  data-d2c_delete_products_nonce="' . $ajax_nonce . '" name="d2c_delete_products"  class="button button-primary button-large d2c_delete_products" >Delete All Products</button>';
+                            echo '<button data-cat="'.$category.'" data-status="' . $products_status . '" data-stock_status="' . $products_stock_status . '" data-count="' . $products_count . '"  data-d2c_delete_products_nonce="' . $ajax_nonce . '" name="d2c_delete_products"  class="button button-primary button-large d2c_delete_products" >Delete All Products</button>';
                         }else{
-                            echo '<button data-cat="any" data-status="' . $status . '" data-count="' . $count . '"  data-d2c_delete_products_nonce="' . $ajax_nonce . '" name="d2c_delete_products"  class="button button-primary button-large d2c_delete_products" >Delete Products</button>';
+                            echo '<button data-cat="any" data-status="' . $products_status . '" data-stock_status="' . $products_stock_status . '" data-count="' . $products_count . '"  data-d2c_delete_products_nonce="' . $ajax_nonce . '" name="d2c_delete_products"  class="button button-primary button-large d2c_delete_products" >Delete Products</button>';
                         }
 
+                    }else{
+                        echo '<p>Sorry, no products were found with the selected criteria.</p>';
                     }
                     echo '&nbsp;<button name="d2c_refresh" class="button button-primary button-large" onClick="location.reload()" >Go Back</button>';
 
@@ -198,6 +214,7 @@ class D2c_ProductDeleteSettingsPage
         
         $products_count = $_POST['count'];
         $products_status = $_POST['status'];
+        $products_stock_status = $_POST['stock_status'];
         $category = $_POST['category'];
 
         $display = '<div class="updated">';
@@ -205,7 +222,6 @@ class D2c_ProductDeleteSettingsPage
         check_ajax_referer('d2c-delete-products', 'wp_nonce');
 
         // Arguments for get_posts
-
         if($category != 'any'){
             $args = array(
                 'numberposts' => $products_count,
@@ -224,6 +240,16 @@ class D2c_ProductDeleteSettingsPage
                 'numberposts' => $products_count,
                 'post_type' => array('product'),
                 'post_status' => $products_status
+            );
+        }
+
+        if($products_stock_status !== 'any'){
+            $args['meta_query'] =  array(
+                array(
+                    'key'     => '_stock_status',
+                    'value'   => $products_stock_status,
+                    'compare' => '='
+                )
             );
         }
 
