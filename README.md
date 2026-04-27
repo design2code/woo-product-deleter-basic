@@ -1,10 +1,11 @@
 # WooCommerce Product Deleter Basic
-
-A lightweight WordPress plugin for managing and deleting WooCommerce products directly from your admin dashboard.
+Yes yes, I know, you can just delete products from the Woocommerce admin panel.
+I built this for a very specific use case where there were so many plugins, themes, and products that the Wordpress/Woocommerce admin barely functioned properly.
+It is a simple lightweight WordPress plugin for managing and deleting WooCommerce products directly from your admin dashboard.
 
 ## Description
 
-WooCommerce admin can be a bit slow on some hosts depending on shared hosting capabilities and amount of products. The Woocommerce Product Deleter Basic provides an intuitive admin interface to view, manage, and delete WooCommerce products. Whether you need to remove a single product or bulk delete multiple items, this plugin makes the process simple and efficient.
+WooCommerce admin can be a bit slow on some hosts depending on shared hosting capabilities, plugins installed, themes used, buggy code and the amount of products. The Woocommerce Product Deleter Basic provides an intuitive admin interface to view, manage, and delete WooCommerce products. Whether you need to remove a single product or bulk delete multiple items, this plugin makes the process simple and efficient without loading any other data such as categories or tags assigned, SEO rankings, Pricing, Dates...etc.
 
 ## Features
 
