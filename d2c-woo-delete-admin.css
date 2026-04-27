@@ -1,0 +1,30 @@
+.d2c_settings_container {
+	width:95%;
+	max-width:900px;
+	float:none;
+	padding:2%;
+}
+
+#d2c_response div.updated {
+	margin:0 0 0;
+}
+
+.d2c_settings_row {
+    overflow: auto;
+	display:block;
+	clear:both;
+	margin:0 0 5px;
+	padding:0 0 5px;
+}
+
+.d2c_settings_row label {
+	width:60%;
+	max-width: 680px;
+	float:left;
+	line-height:41px;
+	vertical-align: center;
+	border-bottom:1px solid #c3c3c3;
+}
+.d2c_settings_row input[type="text"] {
+	padding:10px; 
+}
