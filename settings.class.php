@@ -53,7 +53,7 @@ class D2c_ProductDeleteSettingsPage
     {
         ?>
 
-        <div class="d2c_settings_container card">
+        <div class="d2c_settings_container">
             <div id="d2c_response"></div>
             
             <div class="wrap">
@@ -151,9 +151,11 @@ class D2c_ProductDeleteSettingsPage
                         echo '<h2>Total used products found: ' . count($postslist) . '</h2>';
                         $ajax_single_nonce = wp_create_nonce('d2c-delete-product-nounce');
 
+                        echo '<table border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; text-align: left; border: 1px solid #ddd;"><tr><th>Product Name</th><th>Action</th></tr>';
                         foreach ($postslist as $product) {
-                            echo $product->post_title . ' <a href="#" class="d2c_delete_single_product delete_single_product" data-d2c_delete_product_nonce="'.$ajax_single_nonce.'" data-product_id="'.$product->ID.'" >Delete</a><br />';
+                            echo '<tr style="border-bottom: 1px solid #ddd;"><td>' . $product->post_title . '</td><td><a href="#" class="d2c_delete_single_product delete_single_product" data-d2c_delete_product_nonce="'.$ajax_single_nonce.'" data-product_id="'.$product->ID.'" >Delete</a></td></tr>';
                         }
+                        echo '</table>';
 
                         //link to delete
                         //Set Your Nonce

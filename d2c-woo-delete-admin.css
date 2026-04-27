@@ -1,8 +1,11 @@
 .d2c_settings_container {
 	width:95%;
-	max-width:900px;
-	float:none;
+	/* max-width:100%; */
+	/* float:none; */
 	padding:2%;
+	background-color: #fff;
+	border:1px solid #ccc;
+	margin:20px;
 }
 
 #d2c_response div.updated {
@@ -25,6 +28,13 @@
 	vertical-align: center;
 	border-bottom:1px solid #c3c3c3;
 }
-.d2c_settings_row input[type="text"] {
-	padding:10px; 
+.d2c_settings_row input[type="text"],
+.d2c_settings_row select {
+	/* padding:10px;  */
+	min-width:200px;
+}
+
+/* Datatables Overrides */
+div.dt-container select.dt-input {
+	padding:5px 20px !important;
 }

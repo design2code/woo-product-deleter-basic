@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: WooCommerce Product Deleter Basic - OLD
+Plugin Name: WooCommerce Product Deleter Basic
 Plugin URI:  www.design2code.co.za
 Description: Get all posts of type product and delete selected
 Version:     1.0.0
