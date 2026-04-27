@@ -2,7 +2,7 @@
 /*
 Plugin Name: WooCommerce Product Deleter Basic
 Plugin URI:  www.design2code.co.za
-Description: Get all posts of type product and delete selected
+Description: Get all posts of type product by category or status or stock status and delete selected
 Version:     1.0.0
 Author:      Nathaniel Hamann
 Author URI:  www.design2code.co.za
@@ -21,12 +21,13 @@ define('D2C_PRODUCT_DELETER', plugin_dir_path(__FILE__));
 if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
 
   /* CREATE A SETTINGS PAGE LINK */
-  // add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'pos_settings_links');
-  // function d2c_product_deleter_settings_links($links)
-  // {
-  //   $links[] = '<a href="' . admin_url('options-general.php?page=d2c-img-checker&tab=check_images') . '">' . __('Settings') . '</a>';
-  //   return $links;
-  // }//end nc_settings_link()
+  add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'd2c_product_deleter_settings_links');
+  function d2c_product_deleter_settings_links($links)
+  {
+    $links[] = '<a href="' . admin_url('tools.php?page=d2c-products-deleter') . '">' . __('Settings') . '</a>';
+    return $links;
+  }
+
 
   /* New cron schedule */
   add_filter('cron_schedules', 'add_product_deleter_cron_interval');
@@ -44,7 +45,8 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
   function enable_d2c_product_deleter()
   {
     //notify of enable
-    wp_mail('coders@design2code.co.za', 'New plugin activation - Product Delete', 'The Product delete plugin has just been activated on ' . get_bloginfo('url'));
+    //wp_mail('developer@yourdomain.com', 'New plugin activation - Woo Product Deleter', 'The Product delete plugin has just been activated on ' . get_bloginfo('url'));
+    
     // schedule the product json export cron
     // if (!wp_next_scheduled('delete_products_from_site')) {
     //   wp_schedule_event(time(), 'ten_minutes', 'delete_products_from_site');
@@ -55,7 +57,9 @@ if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_
   register_deactivation_hook(__FILE__, 'disable_d2c_product_deleter');
   function disable_d2c_product_deleter()
   {
-    wp_mail('coders@design2code.co.za', 'Plugin deactivation - Product Delete', 'The Product Delete plugin has just been deactivated on ' . get_bloginfo('url'));
+    //Notify of disable
+    //wp_mail('developer@yourdomain.com', 'Plugin deactivation - Woo Product Deleter', 'The Product Delete plugin has just been deactivated on ' . get_bloginfo('url'));
+    
     //WP cron to check and update
     // wp_clear_scheduled_hook('delete_products_from_site');
   }

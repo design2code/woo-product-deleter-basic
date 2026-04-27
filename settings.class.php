@@ -32,7 +32,7 @@ class D2c_ProductDeleteSettingsPage
             'Woo Product Delete',
             'Woo Product Delete',
             'manage_options',
-            'd2c-products-checker',
+            'd2c-products-deleter',
             array($this, 'create_landing_page')
         );
     }
@@ -120,7 +120,7 @@ class D2c_ProductDeleteSettingsPage
 
                     global $post;
                     $site_url = get_bloginfo('url');
-                    $count = $_POST['product_count'];
+                    $products_count = $_POST['product_count'];
                     $products_status = $_POST['product_status'];//Any, Published, Draft, Trash
                     $products_stock_status = $_POST['product_stock_status']; //instock or outofstock
                     $category = $_POST['product_category'];
@@ -128,7 +128,7 @@ class D2c_ProductDeleteSettingsPage
                     //Fetch products, limited to selected amount
                     if($category != 'any'){
                         $args = array(
-                            'numberposts' => $count,
+                            'numberposts' => $products_count,
                             'post_type' => array('product'),
                             'post_status' => $products_status,
                             'tax_query'      => array(
@@ -141,7 +141,7 @@ class D2c_ProductDeleteSettingsPage
                         );
                     }else{
                         $args = array(
-                            'numberposts' => $count,
+                            'numberposts' => $products_count,
                             'post_type' => array('product'),
                             'post_status' => $products_status
                         );
