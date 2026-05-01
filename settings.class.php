@@ -297,7 +297,7 @@ class D2c_ProductDeleteSettingsPage
 
         // add second parameter to true to immediately permanently delete post
         wp_delete_post($pid, true);
-        //To send to trach first, select the below option
+        //To send to trash first, select the below option
         // wp_trash_post( $product->ID )
 
         //now we delete the images
@@ -393,7 +393,9 @@ class D2c_ProductDeleteSettingsPage
 
         foreach ($products as $product) {
             // add second parameter to true to immediately permanently delete post
-            wp_trash_post($product->ID);
+            wp_delete_post($product->ID, true);
+            //To send to trash first, select the below option
+            // wp_trash_post($product->ID);
         }
     }//end function
 
