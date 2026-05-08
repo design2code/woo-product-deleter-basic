@@ -162,12 +162,12 @@ class D2c_ProductDeleteSettingsPage
 
                     if ($postslist) {
 
-                        echo '<h2>Total used products found: ' . count($postslist) . '</h2>';
-                        $ajax_single_nonce = wp_create_nonce('d2c-delete-product-nounce');
+                        echo '<h2>Total used products found: ' . esc_html(count($postslist)) . '</h2>';
+                        $ajax_single_nonce = wp_create_nonce('d2c_delete_product'); // Fixed: Corrected nonce name from 'nounce' to underscore
 
                         echo '<table border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%; text-align: left; border: 1px solid #ddd;"><tr><th>Product Name</th><th>Action</th></tr>';
                         foreach ($postslist as $product) {
-                            echo '<tr style="border-bottom: 1px solid #ddd;"><td>' . $product->post_title . '</td><td><a href="#" class="d2c_delete_single_product delete_single_product" data-d2c_delete_product_nonce="'.$ajax_single_nonce.'" data-product_id="'.$product->ID.'" >Delete</a></td></tr>';
+                        echo '<tr style="border-bottom: 1px solid #ddd;"><td>' . esc_html($product->post_title) . '</td><td><a href="#" class="d2c_delete_single_product delete_single_product" data-d2c_delete_product_nonce="' . wp_create_nonce('d2c_delete_product') . '" data-product_id="' . $product->ID . '" >Delete</a></td></tr>';
                         }
                         echo '</table>';
 
@@ -175,14 +175,24 @@ class D2c_ProductDeleteSettingsPage
                         //Set Your Nonce
                         $ajax_nonce = wp_create_nonce('d2c-delete-products');
 
-                        if($category != 'any'){
-                            echo '<button data-cat="'.$category.'" data-status="' . $products_status . '" data-stock_status="' . $products_stock_status . '" data-count="' . $products_count . '"  data-d2c_delete_products_nonce="' . $ajax_nonce . '" name="d2c_delete_products"  class="button button-primary button-large d2c_delete_products" >Delete All Products</button>';
-                        }else{
-                            echo '<button data-cat="any" data-status="' . $products_status . '" data-stock_status="' . $products_stock_status . '" data-count="' . $products_count . '"  data-d2c_delete_products_nonce="' . $ajax_nonce . '" name="d2c_delete_products"  class="button button-primary button-large d2c_delete_products" >Delete Products</button>';
+                        if($category != 'any') {
+                            echo '<button data-cat="' . esc_attr($_POST['product_category']) . '" 
+                                data-status="' . esc_attr($_POST['product_status']) . '"
+                                data-stock_status="' . esc_attr($_POST['product_stock_status']) . '"
+                                data-count="' . esc_attr($_POST['product_count']) . '"  
+                                data-d2c_delete_products_nonce="' . $ajax_nonce . '" name="d2c_delete_products"  
+                                class="button button-primary button-large d2c_delete_products" >Delete All Products</button>';
+                        }else {
+                            echo '<button data-cat="any" 
+                                data-status="' . esc_attr($_POST['product_status']) . '"
+                                data-stock_status="' . esc_attr($_POST['product_stock_status']) . '"
+                                data-count="' . esc_attr($_POST['product_count']) . '"  
+                                data-d2c_delete_products_nonce="' . $ajax_nonce . '" name="d2c_delete_products"  
+                                class="button button-primary button-large d2c_delete_products" >Delete Products</button>';
                         }
 
-                    }else{
-                        echo '<p>Sorry, no products were found with the selected criteria.</p>';
+                    }else {
+                        echo '<p>' . esc_html__('Sorry, no products were found with the selected criteria.', 'd2c-product-deleter') . '</p>';
                     }
                     echo '&nbsp;<button name="d2c_refresh" class="button button-primary button-large" onClick="location.reload()" >Go Back</button>';
 
@@ -208,18 +218,18 @@ class D2c_ProductDeleteSettingsPage
      */
     public function d2c_delete_products()
     {
-
         set_time_limit(0);
         ini_set('max_execution_time', 0);
         
-        $products_count = $_POST['count'];
-        $products_status = $_POST['status'];
-        $products_stock_status = $_POST['stock_status'];
-        $category = $_POST['category'];
+        // Sanitize inputs from AJAX request
+        $products_count = isset($_POST['count']) ? absint($_POST['count']) : -1;
+        $products_status = sanitize_text_field($_POST['status'] ?? '');
+        $products_stock_status = sanitize_text_field($_POST['stock_status'] ?? 'any');
+        $category = sanitize_text_field($_POST['category'] ?? 'any');
 
         $display = '<div class="updated">';
 
-        check_ajax_referer('d2c-delete-products', 'wp_nonce');
+        check_ajax_referer('d2c_delete_products', 'wp_nonce');
 
         // Arguments for get_posts
         if($category != 'any'){
@@ -264,7 +274,7 @@ class D2c_ProductDeleteSettingsPage
         }
 
         //now we delete the images
-        $display .= '<p>Products succesfully deleted';
+        $display .= '<p>' . esc_html('Products successfully deleted') . '</p>';
         $display .= '&nbsp;<button name="d2c_refresh" class="button button-primary button-large" onClick="location.reload()" >Go Back</button></p>';
         $display .= '</div>';
 
@@ -272,7 +282,7 @@ class D2c_ProductDeleteSettingsPage
         if ($display != '<div class="updated"></div>') {
             echo $display;
         } else {
-            echo '<div class="error"><p>Sorry, Something went wrong..</p></div>';
+            echo '<div class="error"><p>' . esc_html('Sorry, Something went wrong..') . '</p></div>';
         }
 
         wp_die();
@@ -289,11 +299,11 @@ class D2c_ProductDeleteSettingsPage
     public function d2c_delete_single_product()
     {
         
-        $pid = $_POST['pid'];
+        $pid = isset($_POST['pid']) ? absint($_POST['pid']) : 0;
 
         $display = '<div class="updated">';
 
-        check_ajax_referer('d2c-delete-product-nounce', 'wp_nonce');
+        check_ajax_referer('d2c_delete_product', 'wp_nonce'); // Fixed: Corrected nonce name
 
         // add second parameter to true to immediately permanently delete post
         wp_delete_post($pid, true);
@@ -301,7 +311,7 @@ class D2c_ProductDeleteSettingsPage
         // wp_trash_post( $product->ID )
 
         //now we delete the images
-        $display .= '<p>Product succesfully deleted.</p>';
+        $display .= '<p>' . esc_html('Product successfully deleted.') . '</p>';
         // $display .= '&nbsp;<button name="d2c_refresh" class="button button-primary button-large" onClick="location.reload()" >Go Back</button></p>';
         $display .= '</div>';
 
@@ -309,7 +319,7 @@ class D2c_ProductDeleteSettingsPage
         if ($display != '<div class="updated"></div>') {
             echo $display;
         } else {
-            echo '<div class="error"><p>Sorry, Something went wrong..</p></div>';
+            echo '<div class="error"><p>' . esc_html__('Sorry, something went wrong.', 'd2c-product-deleter') . '</p></div>';
         }
 
         wp_die();
@@ -325,14 +335,15 @@ class D2c_ProductDeleteSettingsPage
      */
     public function d2c_check_count()
     {
-        $products_status = $_POST['status'];
-        $category = $_POST['category'];
+        // Sanitize inputs from AJAX request
+        $products_status = sanitize_text_field($_POST['status'] ?? 'publish');
+        $category = sanitize_text_field($_POST['category'] ?? 'any');
 
         $display = '<div class="updated">';
 
         // Arguments for get_posts
 
-        if($category != 'any'){
+        if($category != 'any') {
             $args = array(
                 'numberposts' => -1,
                 'post_type' => array('product'),
@@ -345,7 +356,7 @@ class D2c_ProductDeleteSettingsPage
                     ),
                 ),
             );
-        }else{
+        }else {
             $args = array(
                 'numberposts' => -1,
                 'post_type' => array('product'),
@@ -358,14 +369,14 @@ class D2c_ProductDeleteSettingsPage
 
 
         //now we delete the images
-        $display .= '<p>'.count($products).' items were found.</p>';
+        $display .= '<p>' . esc_html(count($products)) . ' items were found.</p>';
         $display .= '</div>';
 
         // If display var has not changed, dont display it.
         if ($display != '<div class="updated"></div>') {
             echo $display;
         } else {
-            echo '<div class="error"><p>Sorry, Something went wrong..</p></div>';
+            echo '<div class="error"><p>' . esc_html__('Sorry, something went wrong.', 'd2c-product-deleter') . '</p></div>';
         }
 
         wp_die();
